@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sinosoft.ddss.dao.EmailTaskMapper">
+  <resultMap id="BaseResultMap" type="com.sinosoft.ddss.common.entity.EmailTask">
+    
+    <id column="id" property="id" />
+    <result column="sender"  property="sender" />
+    <result column="receiver"  property="receiver" />
+    <result column="status"  property="status" />
+    <result column="create_time"  property="createTime" />
+    <result column="update_time"  property="updateTime" />
+    <result column="receiver_email" property="receiverEmail" />
+    <result column="content" property="content" />
+    <result column="subject" property="subject" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    
+    id, sender, receiver, status, to_char(create_time, 'yyyy/MM/dd HH24:mi:ss') create_time, to_char(update_time, 'yyyy/MM/dd HH24:mi:ss') update_time, receiver_email, content, subject
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+   
+    select 
+    <include refid="Base_Column_List" />
+    from ddss_email_task
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from ddss_email_task
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.sinosoft.ddss.common.entity.EmailTask">
+    insert into ddss_email_task (id, sender, receiver, 
+      status, create_time, update_time, 
+      receiver_email, content)
+    values (#{id,jdbcType=BIGINT}, #{sender,jdbcType=VARCHAR}, #{receiver,jdbcType=VARCHAR}, 
+      #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{receiverEmail,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.sinosoft.ddss.common.entity.EmailTask">
+    insert into ddss_email_task
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+        id,
+      <if test="sender != null and sender != ''">
+        sender,
+      </if>
+      <if test="receiver != null and receiver != ''">
+        receiver,
+      </if>
+      <if test="status != null and status != ''">
+        status,
+      </if>
+        update_time,
+      <if test="receiverEmail != null and receiverEmail != ''">
+        receiver_email,
+      </if>
+      <if test="content != null and content != ''">
+        content,
+      </if>
+       <if test="subject != null and subject != ''">
+        subject,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+        nextval('ddss_email_task_seq'),
+      <if test="sender != null and sender != ''">
+        #{sender},
+      </if>
+      <if test="receiver != null and receiver != ''">
+        #{receiver},
+      </if>
+      <if test="status != null and status != ''">
+        #{status},
+      </if>
+        #{updateTime},
+      <if test="receiverEmail != null and receiverEmail != ''">
+        #{receiverEmail},
+      </if>
+      <if test="content != null and content != ''">
+        #{content},
+      </if>
+      <if test="subject != null and subject != ''">
+        #{subject},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.sinosoft.ddss.common.entity.EmailTask">
+    update ddss_email_task
+    <set>
+      <if test="sender != null">
+        sender = #{sender,jdbcType=VARCHAR},
+      </if>
+      <if test="receiver != null">
+        receiver = #{receiver,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="receiverEmail != null">
+        receiver_email = #{receiverEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.sinosoft.ddss.common.entity.EmailTask">
+    update ddss_email_task
+    set sender = #{sender,jdbcType=VARCHAR},
+      receiver = #{receiver,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      receiver_email = #{receiverEmail,jdbcType=VARCHAR},
+      content = #{content,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  
+  <select id="listTask" resultMap="BaseResultMap" parameterType="com.sinosoft.ddss.common.entity.EmailTask">
+  	select
+    <include refid="Base_Column_List" />
+    from ddss_email_task where status != 3
+  </select>
+  
+  
+  <select id="listEmailTask" resultMap="BaseResultMap" parameterType="com.sinosoft.ddss.common.entity.query.EmailTaskQuery">
+		select
+		<include refid="Base_Column_List" />
+		from ddss_email_task
+		<trim prefix="WHERE" prefixOverrides="AND | OR">
+		    <if test="receiver != null and receiver != ''">
+				AND receiver = #{receiver}
+			</if>
+			<if test="status != null">
+				AND status = #{status}
+			</if>
+			<if test="startTime != null and startTime != ''">
+				AND to_timestamp(#{startTime}, 'yyyy-mm-dd HH24:mi:ss') &lt;=
+				create_time
+			</if>
+			<if test="endTime != null and endTime != ''">
+				AND to_timestamp(#{endTime}, 'yyyy-mm-dd HH24:mi:ss') &gt;=
+				create_time
+			</if>
+				AND status !=3
+	    </trim>
+	    	<choose>
+				<when test="sortBy != null and sortBy != ''">
+					<if test="sortType == 1">
+						ORDER BY id ASC
+					</if>
+					<if test="sortType != 2">
+						ORDER BY id DESC
+					</if>
+				</when>
+				<otherwise>
+					ORDER BY id DESC
+				</otherwise>
+			</choose>
+	    <if	test="startNum != null and startNum >= 0 and pageSize != null and pageSize > 0">
+			<![CDATA[ limit #{pageSize} offset #{startNum} ]]> 
+		</if>
+  </select>
+  
+  <select id="countTask" parameterType="com.sinosoft.ddss.common.entity.query.EmailTaskQuery" resultType="java.lang.Integer">
+  	 select 
+    count(1)
+    from ddss_email_task
+    <trim prefix="WHERE" prefixOverrides="AND | OR">
+   		<if test="receiver != null and receiver != ''">
+			AND receiver = #{receiver}
+		</if>
+		<if test="status != null">
+				AND status = #{status}
+		</if>
+		<if test="startTime != null and startTime != ''">
+			AND to_timestamp(#{startTime}, 'yyyy-mm-dd HH24:mi:ss') &lt;=
+			create_time
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND to_timestamp(#{endTime}, 'yyyy-mm-dd HH24:mi:ss') &gt;=
+			create_time
+		</if>
+			AND status !=3
+    </trim>
+  </select>
+  
+  <update id="updateEmailStatus">
+  		update ddss_email_task set status = ${arg0},update_time = now() where id in(${arg1})
+  </update>
+</mapper>

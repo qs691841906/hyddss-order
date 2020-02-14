@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sinosoft.ddss.dao.ShopInfoMapper">
+
+	<resultMap id="BaseResultMap" type="com.sinosoft.ddss.common.entity.ShopInfo">
+		<id column="id" jdbcType="NUMERIC" property="id" />
+		<result column="data_id" jdbcType="NUMERIC" property="dataId" />
+		<result column="order_type" jdbcType="SMALLINT" property="orderType" />
+		<result column="satellite" jdbcType="VARCHAR" property="satellite" />
+		<result column="sensor" jdbcType="VARCHAR" property="sensor" />
+		<result column="user_name" jdbcType="VARCHAR" property="userName" />
+		<result column="collection_time" jdbcType="TIMESTAMP" property="collectionTime" />
+		<result column="production_time" jdbcType="TIMESTAMP" property="productionTime" />
+		<result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+		<result column="product_level" jdbcType="VARCHAR" property="productLevel" />
+		<result column="out_product_level" jdbcType="VARCHAR" property="outProductLevel" />
+		<result column="cloud_coverage" jdbcType="SMALLINT" property="cloudCoverage" />
+		<result column="thumb_file_url" property="thumbFileUrl" />
+		<result column="quick_file_url" property="quickFileUrl" />
+		<result column="product_name" property="productName" />
+		<result column="data_size" property="dataSize" />
+		<result column="image_start_time" property="imageStartTime" />
+		<result column="image_end_time" property="imageEndTime" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id, data_id, order_type, satellite, sensor, user_name,
+		to_char(create_time, 'yyyy/MM/dd HH24:mi:ss') create_time,
+		to_char(collection_time, 'yyyy/MM/dd HH24:mi:ss') collection_time,
+		to_char(production_time, 'yyyy/MM/dd HH24:mi:ss') production_time,
+		product_level,out_product_level, cloud_coverage ,thumb_file_url , quick_file_url, product_name,data_size,image_start_time,image_end_time
+	</sql>
+
+	<select id="selectByPrimaryKey" parameterType="java.math.BigDecimal"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from ddss_shop_info
+		where id = #{id,jdbcType=NUMERIC}
+	</select>
+
+	<!-- 批量删除 -->
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from ddss_shop_info
+		where id in (${_parameter})
+	</delete>
+
+	<insert id="insert" parameterType="com.sinosoft.ddss.common.entity.ShopInfo">
+		insert into ddss_shop_info (id, data_id, order_type,
+		satellite, sensor, user_name,
+		create_time, product_level, cloud_coverage
+		)
+		values (#{id,jdbcType=NUMERIC}, #{dataId,jdbcType=NUMERIC},
+		#{orderType,jdbcType=SMALLINT},
+		#{satellite,jdbcType=VARCHAR}, #{sensor,jdbcType=VARCHAR}, #{userName,jdbcType=VARCHAR},
+		#{createTime,jdbcType=TIMESTAMP}, #{productLevel,jdbcType=VARCHAR},
+		#{cloudCoverage,jdbcType=SMALLINT}
+		)
+	</insert>
+
+	<insert id="insertSelective" parameterType="com.sinosoft.ddss.common.entity.ShopInfo">
+		insert into ddss_shop_info
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			id,
+			<if test="dataId != null">
+				data_id,
+			</if>
+			<if test="orderType != null">
+				order_type,
+			</if>
+			<if test="satellite != null">
+				satellite,
+			</if>
+			<if test="sensor != null">
+				sensor,
+			</if>
+			<if test="userName != null">
+				user_name,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="collectionTime != null">
+				collection_time,
+			</if>
+			<if test="productionTime != null">
+				production_time,
+			</if>
+			<if test="productLevel != null">
+				product_level,
+			</if>
+			<if test="cloudCoverage != null">
+				cloud_coverage,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			nextval('ddss_shop_car_seq'),
+			<if test="dataId != null">
+				#{dataId},
+			</if>
+			<if test="orderType != null">
+				#{orderType},
+			</if>
+			<if test="satellite != null">
+				#{satellite},
+			</if>
+			<if test="sensor != null">
+				#{sensor},
+			</if>
+			<if test="userName != null">
+				#{userName},
+			</if>
+			<if test="createTime != null">
+				to_timestamp(#{createTime}, 'yyyy-mm-dd HH24:mi:ss'),
+			</if>
+			<if test="collectionTime != null">
+				to_timestamp(#{collection_time}, 'yyyy-mm-dd HH24:mi:ss'),
+			</if>
+			<if test="productionTime != null">
+				to_timestamp(#{production_time}, 'yyyy-mm-dd HH24:mi:ss'),
+			</if>
+			<if test="productLevel != null">
+				#{productLevel},
+			</if>
+			<if test="cloudCoverage != null">
+				#{cloudCoverage},
+			</if>
+		</trim>
+	</insert>
+
+	<!-- 查询购物车数据 -->
+	<select id="listShopInfo" resultMap="BaseResultMap"
+		parameterType="com.sinosoft.ddss.common.entity.query.ShopInfoQuery">
+		select
+		<include refid="Base_Column_List" />
+		from ddss_shop_info
+		<trim prefix="WHERE" prefixOverrides="AND | OR">
+			<if test="userName != null and userName != ''">
+				AND user_name = #{userName}
+			</if>
+			<if test="orderType != null and orderType != ''">
+				AND order_type = #{orderType}
+			</if>
+			<if test="satellite != null and satellite != ''">
+				AND satellite = #{satellite}
+			</if>
+			<if test="sensor != null and sensor != ''">
+				AND sensor = #{sensor}
+			</if>
+			<if test="productLevel != null and productLevel != ''">
+				AND product_level = #{productLevel}
+			</if>
+			<if test="outProductLevel != null and outProductLevel != ''">
+				AND out_product_level = #{outProductLevel}
+			</if>
+			<if test="cloudCoverage != null and cloudCoverage != ''">
+				AND <![CDATA[cloud_coverage <= #{cloudCoverage}]]>
+			</if>
+			<if test="colStartTime != null and colStartTime != ''">
+				AND to_timestamp(#{colStartTime}, 'yyyy-mm-dd HH24:mi:ss') &lt;=
+				collection_time
+			</if>
+			<if test="colEndTime != null and colEndTime != ''">
+				AND to_timestamp(#{colEndTime}, 'yyyy-mm-dd HH24:mi:ss') &gt;=
+				collection_time
+			</if>
+			<if test="proStartTime != null and proStartTime != ''">
+				AND to_timestamp(#{proStartTime}, 'yyyy-mm-dd HH24:mi:ss') &lt;=
+				production_time
+			</if>
+			<if test="proEndTime != null and proEndTime != ''">
+				AND to_timestamp(#{proEndTime}, 'yyyy-mm-dd HH24:mi:ss') &gt;=
+				production_time
+			</if>
+			<if test="dataIds != null and dataIds != ''">
+				And (${dataIds})
+			</if>
+		</trim>
+		<choose>
+			<when test="sortBy != null and sortBy != ''">
+				<if test="sortType == 1">
+					ORDER BY ${sortBy} ASC,id DESC
+				</if>
+				<if test="sortType != 1">
+					ORDER BY ${sortBy} DESC,id DESC
+				</if>
+			</when>
+			<otherwise>
+				<if test="sortType == 1">
+					ORDER BY id ASC
+				</if>
+				<if test="sortType != 1">
+					ORDER BY id DESC
+				</if>
+			</otherwise>
+		</choose>
+		<if
+			test="startNum != null and startNum >= 0 and pageSize != null and pageSize > 0">
+			<![CDATA[ limit #{pageSize} offset #{startNum} ]]>
+		</if>
+	</select>
+	<!-- 查询数量 -->
+	<select id="getCountByQuery" resultType="java.lang.Integer"
+		parameterType="com.sinosoft.ddss.common.entity.query.ShopInfoQuery">
+		select count(*) from ddss_shop_info
+		<trim prefix="WHERE" prefixOverrides="AND | OR">
+			<if test="userName != null and userName != ''">
+				AND user_name = #{userName}
+			</if>
+			<if test="satellite != null and satellite != ''">
+				AND satellite = #{satellite}
+			</if>
+			<if test="sensor != null and sensor != ''">
+				AND sensor = #{sensor}
+			</if>
+			<if test="productLevel != null and productLevel != ''">
+				AND product_level = #{productLevel}
+			</if>
+			<if test="cloudCoverage != null and cloudCoverage != ''">
+				AND <![CDATA[cloud_coverage <= #{cloudCoverage}]]>
+			</if>
+			<if test="colStartTime != null and colStartTime != ''">
+				AND to_timestamp(#{colStartTime}, 'yyyy-mm-dd HH24:mi:ss') &lt;=
+				collection_time
+			</if>
+			<if test="colEndTime != null and colEndTime != ''">
+				AND to_timestamp(#{colEndTime}, 'yyyy-mm-dd HH24:mi:ss') &gt;=
+				collection_time
+			</if>
+			<if test="proStartTime != null and proStartTime != ''">
+				AND to_timestamp(#{proStartTime}, 'yyyy-mm-dd HH24:mi:ss') &lt;=
+				production_time
+			</if>
+			<if test="proEndTime != null and proEndTime != ''">
+				AND to_timestamp(#{proEndTime}, 'yyyy-mm-dd HH24:mi:ss') &gt;=
+				production_time
+			</if>
+		</trim>
+	</select>
+	<!-- 清空购物车 -->
+	<delete id="delAllShopCar" parameterType="java.lang.String">
+		delete from ddss_shop_info
+		where user_name = #{userName}
+	</delete>
+	<!-- 查询in -->
+	<select id="selectByPrimaryKeys" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from ddss_shop_info
+		where id in (${_parameter})
+	</select>
+	<!-- 批量新增购物车 -->
+	<insert id="saveShopInfo" parameterType="java.util.List">
+		<if test="list != null and list.size() > 0">
+			<foreach collection="list" item="item" separator=";">
+				insert into ddss_shop_info
+				<trim prefix="(" suffix=")" suffixOverrides=",">
+					id,
+					<if test="item.dataId != null and item.dataId != ''">
+						data_id,
+					</if>
+					<if test="item.orderType != null and item.orderType != ''">
+						order_type,
+					</if>
+					<if test="item.satellite != null and item.satellite != ''">
+						satellite,
+					</if>
+					<if test="item.sensor != null and item.sensor != ''">
+						sensor,
+					</if>
+					<if test="item.userName != null and item.userName != ''">
+						user_name,
+					</if>
+					<if test="item.createTime != null and item.createTime != ''">
+						create_time,
+					</if>
+					<if test="item.collectionTime != null and item.collectionTime != ''">
+						collection_time,
+					</if>
+					<if test="item.productionTime != null and item.productionTime != ''">
+						production_time,
+					</if>
+					<if test="item.productLevel != null and item.productLevel != ''">
+						product_level,
+					</if>
+					<if test="item.cloudCoverage != null and item.cloudCoverage != ''">
+						cloud_coverage,
+					</if>
+					<if test="item.outProductLevel != null and item.outProductLevel != ''">
+						out_product_level,
+					</if>
+					<if test="item.thumbFileUrl != null and item.thumbFileUrl != ''">
+						thumb_file_url,
+					</if>
+					<if test="item.quickFileUrl != null and item.quickFileUrl != ''">
+						quick_file_url,
+					</if>
+					<if test="item.productName != null and item.productName != ''">
+						product_name,
+					</if>
+					<if test="item.dataSize != null and item.dataSize != ''">
+						data_size,
+					</if>
+					<if test="item.imageStartTime != null and item.imageStartTime != ''">
+						image_start_time,
+					</if>
+					<if test="item.imageEndTime != null and item.imageEndTime != ''">
+						image_end_time,
+					</if>
+				</trim>
+				<trim prefix="values (" suffix=")" suffixOverrides=",">
+					nextval('ddss_shop_car_seq'),
+					<if test="item.dataId != null and item.dataId != ''">
+						#{item.dataId},
+					</if>
+					<if test="item.orderType != null and item.orderType != ''">
+						#{item.orderType},
+					</if>
+					<if test="item.satellite != null and item.satellite != ''">
+						#{item.satellite},
+					</if>
+					<if test="item.sensor != null and item.sensor != ''">
+						#{item.sensor},
+					</if>
+					<if test="item.userName != null and item.userName != ''">
+						#{item.userName},
+					</if>
+					<if test="item.createTime != null and item.createTime != ''">
+						to_timestamp(#{item.createTime}, 'yyyy-mm-dd HH24:mi:ss'),
+					</if>
+					<if test="item.collectionTime != null and item.collectionTime != ''">
+						to_timestamp(#{item.collectionTime}, 'yyyy-mm-dd HH24:mi:ss'),
+					</if>
+					<if test="item.productionTime != null and item.productionTime != ''">
+						to_timestamp(#{item.productionTime}, 'yyyy-mm-dd HH24:mi:ss'),
+					</if>
+					<if test="item.productLevel != null and item.productLevel != ''">
+						#{item.productLevel},
+					</if>
+					<if test="item.cloudCoverage != null and item.cloudCoverage != ''">
+						#{item.cloudCoverage},
+					</if>
+					<if test="item.outProductLevel != null and item.outProductLevel != ''">
+						#{item.outProductLevel},
+					</if>
+					<if test="item.thumbFileUrl != null and item.thumbFileUrl != ''">
+						#{item.thumbFileUrl},
+					</if>
+					<if test="item.quickFileUrl != null and item.quickFileUrl != ''">
+						#{item.quickFileUrl},
+					</if>
+					<if test="item.productName != null and item.productName != ''">
+						#{item.productName},
+					</if>
+					<if test="item.dataSize != null and item.dataSize != ''">
+						#{item.dataSize},
+					</if>
+					<if test="item.imageStartTime != null and item.imageStartTime != ''">
+						to_timestamp(#{item.imageStartTime}, 'yyyy-mm-dd HH24:mi:ss'),
+					</if>
+					<if test="item.imageEndTime != null and item.imageEndTime != ''">
+						to_timestamp(#{item.imageEndTime}, 'yyyy-mm-dd HH24:mi:ss'),
+					</if>
+				</trim>
+			</foreach>
+		</if>
+	</insert>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteByDataIds" parameterType="com.sinosoft.ddss.common.entity.ShopInfo">
+		delete from ddss_shop_info
+		where order_type = 2 
+		and	user_name = #{userName}
+		and	${dataIds}
+	</delete>
+	
+	<!-- 查询in -->
+	<select id="selectByDataIds" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from ddss_shop_info
+		where data_id in (${_parameter})
+	</select>
+</mapper>

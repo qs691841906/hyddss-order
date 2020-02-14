@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sinosoft.ddss.dao.RoleMapper">
+  <resultMap id="BaseResultMap" type="com.sinosoft.ddss.common.entity.Role">
+    <id column="role_id"  property="roleId" />
+    <result column="role_name" property="roleName" />
+    <result column="description"  property="description" />
+    <result column="order_max_size"  property="orderMaxSize" />
+    <result column="day_max_size"  property="dayMaxSize" />
+    <result column="status" property="status" />
+    <result column="founder" property="founder" />
+    <result column="create_time" property="createTime" />
+    <result column="update_time" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    role_id, role_name, description,order_max_size,day_max_size, status, founder, to_char(create_time, 'yyyy/MM/dd HH24:mi:ss') create_time, to_char(update_time, 'yyyy/MM/dd HH24:mi:ss') update_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.math.BigDecimal" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from ddss_sys_role
+    where role_id = #{roleId}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.math.BigDecimal">
+  <!-- 删除角色 先判断该角色是否被使用  -->
+    delete from ddss_sys_role
+    where role_id = #{roleId};
+    delete from ddss_sys_role_resource where role_id = #{roleId};
+  </delete>
+  <insert id="insertSelective" parameterType="com.sinosoft.ddss.common.entity.Role">
+    insert into ddss_sys_role
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+        role_id,
+      <if test="roleName != null">
+        role_name,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+      <if test="orderMaxSize != null">
+        order_max_size,
+      </if>
+      <if test="dayMaxSize != null">
+        day_max_size,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="founder != null">
+        founder,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+        nextval('ddss_sys_role_seq'),
+      <if test="roleName != null">
+        #{roleName},
+      </if>
+      <if test="description != null">
+        #{description},
+      </if>
+      <if test="orderMaxSize != null">
+        #{orderMaxSize},
+      </if>
+      <if test="dayMaxSize != null">
+        #{dayMaxSize},
+      </if>
+      <if test="status != null">
+        #{status},
+      </if>
+      <if test="founder != null">
+        #{founder},
+      </if>
+      <if test="createTime != null">
+        #{createTime},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.sinosoft.ddss.common.entity.Role">
+    update ddss_sys_role
+    <set>
+      <if test="roleName != null">
+        role_name = #{roleName},
+      </if>
+      <if test="description != null">
+        description = #{description},
+      </if>
+      <if test="orderMaxSize != null">
+        order_max_size = #{orderMaxSize},
+      </if>
+      <if test="dayMaxSize != null">
+        day_max_size = #{dayMaxSize},
+      </if>
+      <if test="status != null">
+        status = #{status},
+      </if>
+      <if test="founder != null">
+        founder = #{founder},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime},
+      </if>
+    </set>
+    where role_id = #{roleId}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.sinosoft.ddss.common.entity.Role">
+    update ddss_sys_role
+    set description = #{description}
+    where role_id = #{roleId}
+  </update>
+  <select id="listRole" parameterType="com.sinosoft.ddss.common.entity.Role" resultMap="BaseResultMap">
+  	 select 
+  	 <include refid="Base_Column_List" />
+    from ddss_sys_role where status = 0
+  </select>
+  
+  <select id="listRoleInit" parameterType="com.sinosoft.ddss.common.entity.query.RoleQuery" resultMap="BaseResultMap">
+  	 select 
+  	 <include refid="Base_Column_List" />
+    from ddss_sys_role 
+    <trim prefix="WHERE" prefixOverrides="AND | OR">
+    	<if test="roleName != null and roleName != ''">
+			AND role_name like '%${roleName}%'
+		</if>
+		<if test="startTime != null and startTime != ''">
+			AND to_timestamp(#{startTime}, 'yyyy-mm-dd HH24:mi:ss') &lt;=
+			create_time
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND to_timestamp(#{endTime}, 'yyyy-mm-dd HH24:mi:ss') &gt;=
+			create_time
+		</if>
+		AND status = 0
+    </trim>
+    <choose>
+		<when test="sortBy != null and sortBy != ''">
+			<if test="sortType == 1">
+				ORDER BY role_id ASC
+			</if>
+			<if test="sortType != 2">
+				ORDER BY role_id DESC
+			</if>
+		</when>
+		<otherwise>
+			ORDER BY role_id DESC
+		</otherwise>
+	</choose>
+    <if	test="startNum != null and startNum >= 0 and pageSize != null and pageSize > 0">
+		<![CDATA[ limit #{pageSize} offset #{startNum} ]]> 
+	</if>
+  </select>
+  <select id="countRole" parameterType="com.sinosoft.ddss.common.entity.query.RoleQuery" resultType="java.lang.Integer">
+  	 select 
+  	 count(1)
+    from ddss_sys_role 
+    <trim prefix="WHERE" prefixOverrides="AND | OR">
+    	<if test="roleName != null and roleName != ''">
+			AND role_name like '%${roleName}%'
+		</if>
+		<if test="startTime != null and startTime != ''">
+			AND to_timestamp(#{startTime}, 'yyyy-mm-dd HH24:mi:ss') &lt;=
+			create_time
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND to_timestamp(#{endTime}, 'yyyy-mm-dd HH24:mi:ss') &gt;=
+			create_time
+		</if>
+		AND status = 0
+    </trim>
+  </select>
+  <select id="getRoleByName" parameterType="com.sinosoft.ddss.common.entity.Role" resultMap="BaseResultMap">
+  	 select 
+  	 	<include refid="Base_Column_List" />
+  	  from ddss_sys_role where role_name = #{roleName}
+  </select>
+  <select id="listRoleByIds" parameterType="com.sinosoft.ddss.common.entity.Role" resultMap="BaseResultMap" >
+	SELECT
+	<include refid="Base_Column_List" />
+	FROM
+	ddss_sys_role 
+	where 
+	role_id IN (${ids})
+  </select>
+</mapper>
